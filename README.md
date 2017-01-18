@@ -7,8 +7,7 @@ Second atempt to build a BootLoader and a Kernel in C/C++.
 ### [Jan. 18th] 
 * BootLoader running in 16-bits mode.
 * BootLoader is now able to print messages.
-* Line Break implemented
-** [BUG] The line is not reseting
+* Line Break & Return implemented
 
 ### Build
 
