@@ -12,7 +12,7 @@ MOV SI, MainMessage ; Sends the string to SI
 CALL Echo ; Call print function
 MOV SI, SecondMessage ; Send another string to SI
 CALL Echo ; Call print function
-JMP $ ; Infinite Loop
+;JMP $ ; Infinite Loop
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,9 +47,52 @@ Echo: ; Function Name
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 0x0a = Line Break/Feed
 ; 0 = eos - End of String
-MainMessage db 'Hello LoS 16-bits', 0x0a, 0 ; String ending with 0
-SecondMessage db '[Waiting for Kernel]', 0x0a, 0 ; String ending with 0
+MainMessage db 'Hello LoS 16-bits', 0x0A, 0x0D, 0 ; String ending with 0
+SecondMessage db '[Waiting for Kernel]', 0x0A, 0x0D, 0 ; String ending with 0
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Filling the boot sector
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;TIMES 510 - ($ - $$) db 0 ; Fill the rest of sector with 0
+;DW 0xAA55 ; Boot Signature at the end of the loader
+
+;;;
+
+[BITS 32]                           ;; here starts the 32 bit code part
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Instructions and Loop
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MOV ESI, MainMessage ; Sends the string to SI
+CALL Echo32 ; Call print function
+JMP $ ; Infinite Loop
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+PrintChar32: ; Function Name
+	
+	; Assume that ASCII value is in register AL
+	MOV AH, 0x0E ; Tell BIOS that we need to print one charater on screen.
+	MOV BH, 0x00 ; Page number
+	MOV BL, 0x07 ; Text attribute 0x07 is lightgrey font on black background
+
+	INT 0x10 ; Call video interrupt
+	RET	; Return
+
+Echo32: ; Function Name
+
+	; Assume that string starting pointer is in register SI
+	next_character32:	; Function to fetch next character from string
+		MOV AL, [ESI] ; Get a byte from string and store in AL register
+		INC ESI ; Increment SI pointer
+		OR AL, AL ; Check if value in AL is zero (end of string)
+		JZ exit_function32 ; If end then return
+		CALL PrintChar32 ; Else print the character which is in AL register
+		JMP next_character32	; Fetch next character from string
+	exit_function32: ; End next_character
+	RET ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Filling the boot sector
