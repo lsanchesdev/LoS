@@ -8,15 +8,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instructions and Loop
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-MOV SI, HelloString ; Send the string to SI
-CALL PrintString ; Call print function
+MOV SI, MainMessage ; Sends the string to SI
+CALL Echo ; Call print function
+MOV SI, SecondMessage ; Send another string to SI
+CALL Echo ; Call print function
 JMP $ ; Infinite Loop
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-PrintCharacter: ; Function Name
+PrintChar: ; Function Name
 	
 	; Assume that ASCII value is in register AL
 	MOV AH, 0x0E ; Tell BIOS that we need to print one charater on screen.
@@ -26,7 +28,7 @@ PrintCharacter: ; Function Name
 	INT 0x10 ; Call video interrupt
 	RET	; Return
 
-PrintString: ; Function Name
+Echo: ; Function Name
 
 	; Assume that string starting pointer is in register SI
 	next_character:	; Function to fetch next character from string
@@ -34,7 +36,7 @@ PrintString: ; Function Name
 		INC SI ; Increment SI pointer
 		OR AL, AL ; Check if value in AL is zero (end of string)
 		JZ exit_function ; If end then return
-		CALL PrintCharacter ; Else print the character which is in AL register
+		CALL PrintChar ; Else print the character which is in AL register
 		JMP next_character	; Fetch next character from string
 	exit_function: ; End next_character
 	RET ; Return
@@ -43,7 +45,10 @@ PrintString: ; Function Name
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Data
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-HelloString db 'Hello LoS 16-bits', 0 ; HelloWorld string ending with 0
+; 0x0a = Line Break/Feed
+; 0 = eos - End of String
+MainMessage db 'Hello LoS 16-bits', 0x0a, 0 ; String ending with 0
+SecondMessage db '[Waiting for Kernel]', 0x0a, 0 ; String ending with 0
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
