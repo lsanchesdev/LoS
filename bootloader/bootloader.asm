@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [BITS 16] ; 16-bits architecture
 [ORG 0x7C00] ; Where the code will be in memory after it's loaded
-
+[extern main]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instructions and Loop
@@ -12,8 +12,7 @@ MOV SI, MainMessage ; Sends the string to SI
 CALL Echo ; Call print function
 MOV SI, SecondMessage ; Send another string to SI
 CALL Echo ; Call print function
-MOV SI, ThirdMessage ; Sends the string to SI
-CALL Echo ; Call print function
+call main
 JMP $ ; Infinite Loop
 
 
